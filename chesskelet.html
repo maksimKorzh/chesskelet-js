@@ -1,0 +1,123 @@
+<script>
+  /*********************************************\
+                   ChesSkelet JS
+
+        a port of ChesSkelet by Alex Garcia
+          from Z80 assembly to JavaScript
+
+                by Code Monkey King
+
+  \*********************************************/
+
+  /*********************************************\
+ 
+     Color encoding:
+
+         White = 0
+         Black = 1
+
+     Piece encoding:
+     
+         wP = 0x05   0 0 00  01 01
+         wN = 0x11   0 0 01  00 01
+         wB = 0x19   0 0 01  10 01
+         wR = 0x29   0 0 10  10 01
+         wQ = 0x39   0 0 11  10 01
+         wK = 0x51   0 1 01  00 01
+
+         bP = 0x07   0 0 00  01 11
+         bN = 0x13   0 0 01  00 11
+         bB = 0x1B   0 0 01  10 11
+         bR = 0x2B   0 0 10  10 11
+         bQ = 0x3B   0 0 11  10 11
+         bK = 0x53   0 1 01  00 11
+
+         Bit0: set to 1 for all pieces
+         Bit1: piece color
+         Bit2: identifies pawns
+         Bit3: identifies slider pieces
+         Bit4: contributes to piece value
+         Bit5: contributes to piece value
+         Bit6: identifies the King
+         Bit2 - Bit6: piece value
+
+  \*********************************************/
+
+  // Chess piece encoding
+  const eS = 0x00;
+  const wP = 0x05;
+  const wN = 0x11;
+  const wB = 0x19;
+  const wR = 0x29;
+  const wQ = 0x39;
+  const wK = 0x51;
+  const bP = 0x07;
+  const bN = 0x13;
+  const bB = 0x1B;
+  const bR = 0x2B;
+  const bQ = 0x3B;
+  const bK = 0x53;
+
+  // Chess piece representation
+  let pieces = {
+    0x00: '.',
+    0x07: 'p',
+    0x13: 'n',
+    0x1B: 'b',
+    0x2B: 'r',
+    0x3B: 'q',
+    0x53: 'k',
+    0x05: 'P',
+    0x11: 'N',
+    0x19: 'B',
+    0x29: 'R',
+    0x39: 'Q',
+    0x51: 'K',
+  };
+
+  // Chess board representation
+  var board = [
+    bR, bN, bB, bQ, bK, bB, bN, bR,  eS, eS, eS, eS, eS, eS, eS, eS,
+    bP, bP, bP, bP, bP, bP, bP, bP,  eS, eS, eS, eS, eS, eS, eS, eS,
+    eS, eS, eS, eS, eS, eS, eS, eS,  eS, eS, eS, eS, eS, eS, eS, eS,
+    eS, eS, eS, eS, eS, eS, eS, eS,  eS, eS, eS, eS, eS, eS, eS, eS,
+    eS, eS, eS, eS, eS, eS, eS, eS,  eS, eS, eS, eS, eS, eS, eS, eS,
+    eS, eS, eS, eS, eS, eS, eS, eS,  eS, eS, eS, eS, eS, eS, eS, eS,
+    wP, wP, wP, wP, wP, wP, wP, wP,  eS, eS, eS, eS, eS, eS, eS, eS,
+    wR, wN, wB, wQ, wK, wB, wN, wR,  eS, eS, eS, eS, eS, eS, eS, eS
+  ];
+
+  // Move vector table pointers
+  var vector_pointers = {
+    0x00: 0xF0,
+    0x07: 0xFA,
+    0x13: 0xF4,
+    0x1B: 0xFB,
+    0x2B: 0xF1,
+    0x3B: 0xF9,
+    0x53: 0xF9,
+  };
+
+  // Move vector table
+  var vector_lists = {
+    0xF1: [0x01, 0x10],                                          // Rook move offsets
+    0xF4: [0xE1, 0xF2, 0x12, 0x21],                              // Knight move offsets
+    0xF9: [0x01, 0x10, 0x0F, 0x11],                              // Queen/King, Pawn (+1), Bishop (+2)
+  };
+
+  // Loop over board squares
+  let position = "";
+  for (let square = 0; square < 128; square++) {
+    if ((square & 0x08) == 0) {                                  // If square is on board
+      let piece = board[square];                                 // Get piece
+      position += pieces[piece];                                 // Print piece
+    } else {                                                     // Otherwise square is off board
+      position += "\n";                                          // Print new line
+      square += 7;                                               // Skip offboard squares
+    }
+  }
+
+  // Print board
+  console.log(position)
+
+</script>
