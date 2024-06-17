@@ -75,42 +75,47 @@
     0x51: 'K',
   };
 
-  // Chess board representation
-  var board = [
-    bR, bN, bB, bQ, bK, bB, bN, bR,  eS, eS, eS, eS, eS, eS, eS, eS,
-    bP, bP, bP, bP, bP, bP, bP, bP,  eS, eS, eS, eS, eS, eS, eS, eS,
-    eS, eS, eS, eS, eS, eS, eS, eS,  eS, eS, eS, eS, eS, eS, eS, eS,
-    eS, eS, eS, eS, eS, eS, eS, eS,  eS, eS, eS, eS, eS, eS, eS, eS,
-    eS, eS, eS, eS, eS, eS, eS, eS,  eS, eS, eS, eS, eS, eS, eS, eS,
-    eS, eS, eS, eS, eS, eS, eS, eS,  eS, eS, eS, eS, eS, eS, eS, eS,
-    wP, wP, wP, wP, wP, wP, wP, wP,  eS, eS, eS, eS, eS, eS, eS, eS,
-    wR, wN, wB, wQ, wK, wB, wN, wR,  eS, eS, eS, eS, eS, eS, eS, eS
+  var board = [                                                  // Chess board representation
+    bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 8 + dummy squares
+    bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 7 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 6 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 5 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 4 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 3 + dummy squares
+    wP, wP, wP, wP, wP, wP, wP, wP,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 2 + dummy squares
+    wR, wN, wB, wQ, wK, wB, wN, wR,  0, 0, 0, 0, 0, 0, 0, 0      // Rank 1 + dummy squares
+  ];
+  
+  var vector_pointers = {                                        // Move vector table pointers
+    0x82: 0xF0,
+    0x87: 0xFA,                                                  // Pawn moves address
+    0x93: 0xF4,                                                  // Knight moves address
+    0x9B: 0xFB,                                                  // Bishop moves address
+    0xAB: 0xF1,                                                  // Rook moves address
+    0xBB: 0xF9,                                                  // Queen moves address
+    0xD3: 0xF9                                                   // King Moves address
+  };
+
+  var vector_lists = [                                           // Move vector table
+    0x01, 0x10, 0x00,                                            // Rook move offsets
+    0xE1, 0xF2, 0x12, 0x21, 0x00,                                // Knight move offsets
+    0x01, 0x10, 0x0F, 0x11, 0x00                                 // Queen/King, Pawn (+1), Bishop (+2)
   ];
 
-  // Move vector table pointers
-  var vector_pointers = {
-    0x00: 0xF0,
-    0x07: 0xFA,
-    0x13: 0xF4,
-    0x1B: 0xFB,
-    0x2B: 0xF1,
-    0x3B: 0xF9,
-    0x53: 0xF9,
-  };
-
-  // Move vector table
-  var vector_lists = {
-    0xF1: [0x01, 0x10],                                          // Rook move offsets
-    0xF4: [0xE1, 0xF2, 0x12, 0x21],                              // Knight move offsets
-    0xF9: [0x01, 0x10, 0x0F, 0x11],                              // Queen/King, Pawn (+1), Bishop (+2)
-  };
-
-  // Loop over board squares
-  let position = "";
-  for (let square = 0; square < 128; square++) {
+  let position = "";                                             // Board position string representation
+  for (let square = 0; square < 128; square++) {                 // Loop over board squares
     if ((square & 0x08) == 0) {                                  // If square is on board
-      let piece = board[square];                                 // Get piece
-      position += pieces[piece];                                 // Print piece
+      let piece = board[square];                                 // Get square content
+      if (piece) {                                               // If there's a piece on a square
+        let vector_pointer = vector_pointers[piece | 0x82];
+        vector_pointer -= 0xF1;
+        let vector_offsets = vector_lists[vector_pointer];
+        console.log(vector_pointer.toString(16))
+       /* for (let offset = 0; offset < vector_offsets.length; offset++) {
+          console.log(vector_offsets[offset].toString(16));
+        }*/
+      }
+      position += pieces[piece];                                 // Print square content
     } else {                                                     // Otherwise square is off board
       position += "\n";                                          // Print new line
       square += 7;                                               // Skip offboard squares
