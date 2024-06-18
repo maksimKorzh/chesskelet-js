@@ -130,7 +130,11 @@
             target_sq += vector_offset;
             if ((target_sq & 0x88)) break;
 
+            
             board[target_sq+8] = 0x10; // debug mark attacked square
+
+
+            if ((piece & 0x08) == 0) break;                      // Do not follow attack ray for leaper pieces
           }
           if (direction > 0) {
             vector_pointer++;
