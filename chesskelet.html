@@ -107,9 +107,8 @@
   };
 
   var vector_lists = [                                           // Move vector table
-    0x00, 
     0x01, 0x10, 0x00,                                            // Rook move offsets
-   -0x12,-0x21, 0x12, 0x21, 0x00,                                // Knight move offsets
+    0x0E, 0x1F, 0x12, 0x21, 0x00,                                // Knight move offsets
     0x01, 0x10, 0x0F, 0x11, 0x00                                 // Queen/King, Pawn (+1), Bishop (+2)
   ];
 
@@ -119,9 +118,10 @@
       let piece = board[source_sq];                                 // Get source_sq content
       if (piece) {                                               // If there's a piece on a source_sq
         let vector_pointer = vector_pointers[piece | 0x82];
-        vector_pointer -= 0xF0;
+        vector_pointer -= 0xF1;
         let vector_offset = 1;
         let direction = 1;
+        let offset_number = 0;
         while (vector_offset) {
           vector_offset = vector_lists[vector_pointer] * direction;
           if (vector_offset == 0) break;
@@ -129,16 +129,20 @@
           while (1) {
             target_sq += vector_offset;
             if ((target_sq & 0x88)) break;
-            console.log(vector_offset.toString(16) + "   " + target_sq.toString(16))
+
+            board[target_sq+8] = 0x10; // debug mark attacked square
           }
           if (direction > 0) {
             vector_pointer++;
+            offset_number++;
             if (vector_lists[vector_pointer] == 0) {
               direction = -1;
               vector_pointer--;
             }
           } else {
             vector_pointer--;
+            offset_number--;
+            if (offset_number == 0) break;
           }
         }
       }
@@ -151,5 +155,20 @@
 
   // Print board
   console.log(position)
+
+  function printAttackBoard() {
+    let attacks = "";
+    for (let sq = 0; sq < 128; sq++) {                 // Loop over board source_sqs
+      if ((sq & 0x08) == 8) {
+        attacks += board[sq] ? "x": ".";
+      } else {
+        attacks += "\n";
+        sq += 7;
+      }
+    }
+    console.log(attacks);
+  }
+
+  printAttackBoard();
 
 </script>
