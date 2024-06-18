@@ -75,7 +75,7 @@
     0x51: 'K',
   };
 
-  var board = [                                                  // Chess board representation
+ /* var board = [                                                  // Chess board representation
     bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 8 + dummy squares
     bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 7 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 6 + dummy squares
@@ -84,6 +84,16 @@
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 3 + dummy squares
     wP, wP, wP, wP, wP, wP, wP, wP,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 2 + dummy squares
     wR, wN, wB, wQ, wK, wB, wN, wR,  0, 0, 0, 0, 0, 0, 0, 0      // Rank 1 + dummy squares
+  ];*/
+  var board = [                                                  // Chess board representation
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 8 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 7 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 6 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 5 + dummy squares
+    eS, eS, eS, eS, wR, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 4 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 3 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 2 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0      // Rank 1 + dummy squares
   ];
   
   var vector_pointers = {                                        // Move vector table pointers
@@ -109,11 +119,12 @@
       if (piece) {                                               // If there's a piece on a square
         let vector_pointer = vector_pointers[piece | 0x82];
         vector_pointer -= 0xF1;
-        let vector_offsets = vector_lists[vector_pointer];
-        console.log(vector_pointer.toString(16))
-       /* for (let offset = 0; offset < vector_offsets.length; offset++) {
-          console.log(vector_offsets[offset].toString(16));
-        }*/
+        let vector_offset = 1;
+        while (vector_offset) {
+          vector_offset = vector_lists[vector_pointer];
+          console.log(vector_offset);
+          vector_pointer++;
+        }
       }
       position += pieces[piece];                                 // Print square content
     } else {                                                     // Otherwise square is off board
