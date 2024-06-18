@@ -87,10 +87,10 @@
   ];*/
   var board = [                                                  // Chess board representation
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 8 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 7 + dummy squares
+    eS, eS, eS, eS, bP, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 7 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 6 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 5 + dummy squares
-    eS, eS, eS, eS, wN, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 4 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 4 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 3 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 2 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0      // Rank 1 + dummy squares
@@ -129,10 +129,24 @@
           while (1) {
             target_sq += vector_offset;
             if ((target_sq & 0x88)) break;
+            if (piece == wP && direction > 0) break;
+            if (piece == bP && direction < 0) break;
+            if ((piece & 0x02)) {                                // If piece is black
+              if (board[target_sq] & 0x02) break;                // Target square contains a black piece
+              if (piece & 0x04) {                                // Black pawn
+                if ((board[target_sq] + vector_offset) % 2 != 0) break;     // Pawn illegal
+                
+              }
 
+
+              board[target_sq+8] = 0x10;                         // Add move to the move list
+
+
+              if ((board[target_sq] & 0x03) == 1) break;         // Target square contains a white piece
+            } else {                                             // If piece is white
+              // TODO: if move is legal mark attacked square
+            }
             
-            board[target_sq+8] = 0x10; // debug mark attacked square
-
 
             if ((piece & 0x08) == 0) break;                      // Do not follow attack ray for leaper pieces
           }
