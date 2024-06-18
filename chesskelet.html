@@ -43,142 +43,141 @@
 
   \*********************************************/
 
-  // Chess piece encoding
-  const eS = 0x00;
-  const wP = 0x05;
-  const wN = 0x11;
-  const wB = 0x19;
-  const wR = 0x29;
-  const wQ = 0x39;
-  const wK = 0x51;
-  const bP = 0x07;
-  const bN = 0x13;
-  const bB = 0x1B;
-  const bR = 0x2B;
-  const bQ = 0x3B;
-  const bK = 0x53;
+  const eS = 0x00;                                                       // Empty square
+  const wP = 0x05;                                                       // White pawn
+  const wN = 0x11;                                                       // White knight
+  const wB = 0x19;                                                       // White bishop
+  const wR = 0x29;                                                       // White rook
+  const wQ = 0x39;                                                       // White queen
+  const wK = 0x51;                                                       // White king
+  const bP = 0x07;                                                       // Black pawn
+  const bN = 0x13;                                                       // Black knight
+  const bB = 0x1B;                                                       // Black bishop
+  const bR = 0x2B;                                                       // Black rook
+  const bQ = 0x3B;                                                       // Black queen
+  const bK = 0x53;                                                       // Black king
 
-  // Chess piece representation
-  let pieces = {
-    0x00: '.',
-    0x07: 'p',
-    0x13: 'n',
-    0x1B: 'b',
-    0x2B: 'r',
-    0x3B: 'q',
-    0x53: 'k',
-    0x05: 'P',
-    0x11: 'N',
-    0x19: 'B',
-    0x29: 'R',
-    0x39: 'Q',
-    0x51: 'K',
+  let pieces = {                                                         // Piece chars
+    0x00: '.',                                                           // Empty square
+    0x07: 'p',                                                           // Black pawn
+    0x13: 'n',                                                           // Black knight
+    0x1B: 'b',                                                           // Black bishop
+    0x2B: 'r',                                                           // Black rook
+    0x3B: 'q',                                                           // Black queen
+    0x53: 'k',                                                           // Black king
+    0x05: 'P',                                                           // White pawn
+    0x11: 'N',                                                           // White knight
+    0x19: 'B',                                                           // White bishop
+    0x29: 'R',                                                           // White rook
+    0x39: 'Q',                                                           // White queen
+    0x51: 'K'                                                            // White king
   };
 
- /* var board = [                                                  // Chess board representation
-    bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 8 + dummy squares
-    bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 7 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 6 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 5 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 4 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 3 + dummy squares
-    wP, wP, wP, wP, wP, wP, wP, wP,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 2 + dummy squares
-    wR, wN, wB, wQ, wK, wB, wN, wR,  0, 0, 0, 0, 0, 0, 0, 0      // Rank 1 + dummy squares
+ /* var board = [                                                        // Chess board representation
+    bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 8 + dummy squares
+    bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 5 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 3 + dummy squares
+    wP, wP, wP, wP, wP, wP, wP, wP,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 2 + dummy squares
+    wR, wN, wB, wQ, wK, wB, wN, wR,  0, 0, 0, 0, 0, 0, 0, 0              // Rank 1 + dummy squares
   ];*/
-  var board = [                                                  // Chess board representation
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 8 + dummy squares
-    eS, eS, eS, eS, bP, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 7 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 6 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 5 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 4 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 3 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 2 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0      // Rank 1 + dummy squares
+  
+  var debug_board = new Array(128).fill(0);
+  var board = [                                                          // Chess board representation
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 8 + dummy squares
+    eS, eS, eS, eS, wP, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 5 + dummy squares
+    eS, eS, eS, eS, bQ, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
+    eS, eS, eS, wP, eS, bP, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 3 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 2 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0              // Rank 1 + dummy squares
   ];
   
-  var vector_pointers = {                                        // Move vector table pointers
-    0x82: 0xF0,
-    0x87: 0xFA,                                                  // Pawn moves address
-    0x93: 0xF4,                                                  // Knight moves address
-    0x9B: 0xFB,                                                  // Bishop moves address
-    0xAB: 0xF1,                                                  // Rook moves address
-    0xBB: 0xF9,                                                  // Queen moves address
-    0xD3: 0xF9                                                   // King Moves address
+  var vector_pointers = {                                                // Move vector table pointers
+    //0x82: 0xF0,
+    0x87: 0xFA,                                                          // Pawn moves address
+    0x93: 0xF4,                                                          // Knight moves address
+    0x9B: 0xFB,                                                          // Bishop moves address
+    0xAB: 0xF1,                                                          // Rook moves address
+    0xBB: 0xF9,                                                          // Queen moves address
+    0xD3: 0xF9                                                           // King Moves address
   };
 
-  var vector_lists = [                                           // Move vector table
-    0x01, 0x10, 0x00,                                            // Rook move offsets
-    0x0E, 0x1F, 0x12, 0x21, 0x00,                                // Knight move offsets
-    0x01, 0x10, 0x0F, 0x11, 0x00                                 // Queen/King, Pawn (+1), Bishop (+2)
+  var vector_lists = [                                                   // Move vector table
+    0x01, 0x10, 0x00,                                                    // Rook move offsets
+    0x0E, 0x1F, 0x12, 0x21, 0x00,                                        // Knight move offsets
+    0x01, 0x10, 0x0F, 0x11, 0x00                                         // Queen/King, Pawn (+1), Bishop (+2)
   ];
 
-  let position = "";                                             // Board position string representation
-  for (let source_sq = 0; source_sq < 128; source_sq++) {                 // Loop over board source_sqs
-    if ((source_sq & 0x08) == 0) {                                  // If source_sq is on board
-      let piece = board[source_sq];                                 // Get source_sq content
-      if (piece) {                                               // If there's a piece on a source_sq
-        let vector_pointer = vector_pointers[piece | 0x82];
-        vector_pointer -= 0xF1;
-        let vector_offset = 1;
-        let direction = 1;
-        let offset_number = 0;
-        while (vector_offset) {
-          vector_offset = vector_lists[vector_pointer] * direction;
-          if (vector_offset == 0) break;
-          let target_sq = source_sq;
-          while (1) {
-            target_sq += vector_offset;
-            if ((target_sq & 0x88)) break;
-            if (piece == wP && direction > 0) break;
-            if (piece == bP && direction < 0) break;
-            if ((piece & 0x02)) {                                // If piece is black
-              if (board[target_sq] & 0x02) break;                // Target square contains a black piece
-              if (piece & 0x04) {                                // Black pawn
-                if ((board[target_sq] + vector_offset) % 2 != 0) break;     // Pawn illegal
+  let position = "";                                                     // Board position string to print
+  for (let source_sq = 0; source_sq < 128; source_sq++) {                // Loop over board squares
+    if ((source_sq & 0x08) == 0) {                                       // If square is on board
+      let piece = board[source_sq];                                      // Get square content
+      if (piece) {                                                       // If there's a piece on a square
+        let vector_pointer = vector_pointers[piece | 0x82];              // Pick up vector pointer for a piece
+        vector_pointer -= 0xF1;                                          // Adjust vector pointer starting address
+        let vector_offset = 1;                                           // Define vector offset just to enter while loop
+        let direction = 1;                                               // Forward or backward vectors traversal direction
+        let offset_count = 0;                                            // Keep track of number of elements in a vector
+        while (vector_offset) {                                          // Loop over vector offsets
+          vector_offset = vector_lists[vector_pointer] * direction;      // Adjust vector direction
+          if (vector_offset == 0) break;                                 // No more vectors to traverse?
+          let target_sq = source_sq;                                     // Init target square
+          while (1) {                                                    // Loop over squares along the given vector offset
+            target_sq += vector_offset;                                  // Get next target square
+            if ((target_sq & 0x88)) break;                               // Stop if target square is offboard
+            if (piece == wP && direction > 0) break;                     // White pawns move only upwards
+            if (piece == bP && direction < 0) break;                     // Black pawns move only downwards
+            if ((piece & 0x02)) {                                        // If piece is black
+              if (board[target_sq] & 0x02) break;                        // Stop if target square contains a black piece
+              if (piece & 0x04)                                          // Is it a pawn?
+                if ((board[target_sq] + vector_offset) % 2 != 0) break;  // Skip illegal pawn moves
                 
-              }
+
+              debug_board[target_sq+8] = 0x10;                           // Add move to the move list
 
 
-              board[target_sq+8] = 0x10;                         // Add move to the move list
-
-
-              if ((board[target_sq] & 0x03) == 1) break;         // Target square contains a white piece
-            } else {                                             // If piece is white
+              if ((board[target_sq] & 0x03) == 1) break;                 // Target square contains a white piece
+            } else {                                                     // If piece is white
               // TODO: if move is legal mark attacked square
             }
             
 
-            if ((piece & 0x08) == 0) break;                      // Do not follow attack ray for leaper pieces
+            if ((piece & 0x08) == 0) break;                              // Do not follow attack ray for leaper pieces
           }
-          if (direction > 0) {
-            vector_pointer++;
-            offset_number++;
-            if (vector_lists[vector_pointer] == 0) {
-              direction = -1;
-              vector_pointer--;
+          if (direction > 0) {                                           // If direction is positive
+            vector_pointer++;                                            // Increment vector pointer
+            offset_count++;                                              // Increment offset count
+            if (vector_lists[vector_pointer] == 0) {                     // No more vectors?
+              direction = -1;                                            // Switch direction to negative
+              vector_pointer--;                                          // Avoid overflow
             }
-          } else {
-            vector_pointer--;
-            offset_number--;
-            if (offset_number == 0) break;
+          } else {                                                       // If direction is negative
+            vector_pointer--;                                            // Decrement vector pointer
+            offset_count--;                                              // Decrement offset count
+            if (offset_count == 0) break;                                // Stop when all offsets has been traversed
           }
         }
       }
-      position += pieces[piece];                                 // Print source_sq content
-    } else {                                                     // Otherwise source_sq is off board
-      position += "\n";                                          // Print new line
-      source_sq += 7;                                               // Skip offboard source_sqs
+      position += pieces[piece];                                         // Print piece
+    } else {                                                             // Otherwise square is off board
+      position += "\n";                                                  // Print new line
+      source_sq += 7;                                                    // Skip offboard squares
     }
   }
+  console.log(position);                                                 // Render board
 
-  // Print board
-  console.log(position)
 
+
+  // DEBUG
   function printAttackBoard() {
     let attacks = "";
     for (let sq = 0; sq < 128; sq++) {                 // Loop over board source_sqs
       if ((sq & 0x08) == 8) {
-        attacks += board[sq] ? "x": ".";
+        attacks += debug_board[sq] ? "x": ".";
       } else {
         attacks += "\n";
         sq += 7;
