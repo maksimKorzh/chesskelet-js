@@ -90,7 +90,7 @@
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 7 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 6 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 5 + dummy squares
-    eS, eS, eS, eS, wR, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 4 + dummy squares
+    eS, eS, eS, eS, wN, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 4 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 3 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,     // Rank 2 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0      // Rank 1 + dummy squares
@@ -107,29 +107,45 @@
   };
 
   var vector_lists = [                                           // Move vector table
+    0x00, 
     0x01, 0x10, 0x00,                                            // Rook move offsets
-    0xE1, 0xF2, 0x12, 0x21, 0x00,                                // Knight move offsets
+   -0x12,-0x21, 0x12, 0x21, 0x00,                                // Knight move offsets
     0x01, 0x10, 0x0F, 0x11, 0x00                                 // Queen/King, Pawn (+1), Bishop (+2)
   ];
 
   let position = "";                                             // Board position string representation
-  for (let square = 0; square < 128; square++) {                 // Loop over board squares
-    if ((square & 0x08) == 0) {                                  // If square is on board
-      let piece = board[square];                                 // Get square content
-      if (piece) {                                               // If there's a piece on a square
+  for (let source_sq = 0; source_sq < 128; source_sq++) {                 // Loop over board source_sqs
+    if ((source_sq & 0x08) == 0) {                                  // If source_sq is on board
+      let piece = board[source_sq];                                 // Get source_sq content
+      if (piece) {                                               // If there's a piece on a source_sq
         let vector_pointer = vector_pointers[piece | 0x82];
-        vector_pointer -= 0xF1;
+        vector_pointer -= 0xF0;
         let vector_offset = 1;
+        let direction = 1;
         while (vector_offset) {
-          vector_offset = vector_lists[vector_pointer];
-          console.log(vector_offset);
-          vector_pointer++;
+          vector_offset = vector_lists[vector_pointer] * direction;
+          if (vector_offset == 0) break;
+          let target_sq = source_sq;
+          while (1) {
+            target_sq += vector_offset;
+            if ((target_sq & 0x88)) break;
+            console.log(vector_offset.toString(16) + "   " + target_sq.toString(16))
+          }
+          if (direction > 0) {
+            vector_pointer++;
+            if (vector_lists[vector_pointer] == 0) {
+              direction = -1;
+              vector_pointer--;
+            }
+          } else {
+            vector_pointer--;
+          }
         }
       }
-      position += pieces[piece];                                 // Print square content
-    } else {                                                     // Otherwise square is off board
+      position += pieces[piece];                                 // Print source_sq content
+    } else {                                                     // Otherwise source_sq is off board
       position += "\n";                                          // Print new line
-      square += 7;                                               // Skip offboard squares
+      source_sq += 7;                                               // Skip offboard source_sqs
     }
   }
 
