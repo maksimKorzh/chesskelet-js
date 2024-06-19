@@ -23,14 +23,14 @@
          wB = 0x19   0 0 01  10 01
          wR = 0x29   0 0 10  10 01
          wQ = 0x39   0 0 11  10 01
-         wK = 0x51   0 1 01  00 01
+         wK = 0x41   0 1 00  00 01
 
          bP = 0x07   0 0 00  01 11
          bN = 0x13   0 0 01  00 11
          bB = 0x1B   0 0 01  10 11
          bR = 0x2B   0 0 10  10 11
          bQ = 0x3B   0 0 11  10 11
-         bK = 0x53   0 1 01  00 11
+         bK = 0x43   0 1 00  00 11
 
          Bit0: set to 1 for all pieces
          Bit1: piece color
@@ -49,13 +49,13 @@
   const wB = 0x19;                                                       // White bishop
   const wR = 0x29;                                                       // White rook
   const wQ = 0x39;                                                       // White queen
-  const wK = 0x51;                                                       // White king
+  const wK = 0x41;                                                       // White king
   const bP = 0x07;                                                       // Black pawn
   const bN = 0x13;                                                       // Black knight
   const bB = 0x1B;                                                       // Black bishop
   const bR = 0x2B;                                                       // Black rook
   const bQ = 0x3B;                                                       // Black queen
-  const bK = 0x53;                                                       // Black king
+  const bK = 0x43;                                                       // Black king
 
   let pieces = {                                                         // Piece chars
     0x00: '.',                                                           // Empty square
@@ -64,37 +64,37 @@
     0x1B: 'b',                                                           // Black bishop
     0x2B: 'r',                                                           // Black rook
     0x3B: 'q',                                                           // Black queen
-    0x53: 'k',                                                           // Black king
+    0x43: 'k',                                                           // Black king
     0x05: 'P',                                                           // White pawn
     0x11: 'N',                                                           // White knight
     0x19: 'B',                                                           // White bishop
     0x29: 'R',                                                           // White rook
     0x39: 'Q',                                                           // White queen
-    0x51: 'K'                                                            // White king
+    0x41: 'K'                                                            // White king
   };
 
- /* var board = [                                                        // Chess board representation
-    bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 8 + dummy squares
-    bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 5 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 3 + dummy squares
-    wP, wP, wP, wP, wP, wP, wP, wP,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 2 + dummy squares
-    wR, wN, wB, wQ, wK, wB, wN, wR,  0, 0, 0, 0, 0, 0, 0, 0              // Rank 1 + dummy squares
-  ];*/
+  var board = [                                                          // Chess board representation
+    bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,             //
+    bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,             // Left hand side of the board
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // is used to store the current
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // position
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // 
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Right hand side of board is
+    wP, wP, wP, wP, wP, wP, wP, wP,  0, 0, 0, 0, 0, 0, 0, 0,             // used to store white attack
+    wR, wN, wB, wQ, wK, wB, wN, wR,  0, 0, 0, 0, 0, 0, 0, 0              // map
+  ];
   
   var debug_board = new Array(128).fill(0);
-  var board = [                                                          // Chess board representation
+  /*var board = [                                                          // Chess board representation
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 8 + dummy squares
-    eS, eS, eS, eS, bP, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
+    eS, eS, eS, eS, wR, wP, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 5 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
+    eS, eS, eS, eS, bP, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 3 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 2 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0              // Rank 1 + dummy squares
-  ];
+  ];*/
   
   var vector_pointers = {                                                // Move vector table pointers
     0x87: 0xFA,                                                          // Pawn moves address
@@ -112,6 +112,7 @@
   ];
 
   let position = "";                                                     // Board position string to print
+  let move_list = [];                                                    // All moves generated for black
   for (let source_sq = 0; source_sq < 128; source_sq++) {                // Loop over board squares
     if ((source_sq & 0x08) == 0) {                                       // If square is on board
       let piece = board[source_sq];                                      // Get square content
@@ -120,7 +121,7 @@
         vector_pointer -= 0xF1;                                          // Adjust vector pointer starting address
         let vector_offset = 1;                                           // Define vector offset just to enter while loop
         let direction = 1;                                               // Forward or backward vectors traversal direction
-        let offset_count = 0;                                            // Keep track of number of elements in a vector
+        let offset_count = 0;                                            // Keep track of number of offsets in a vector
         while (vector_offset) {                                          // Loop over vector offsets
           vector_offset = vector_lists[vector_pointer] * direction;      // Adjust vector direction
           if (vector_offset == 0) break;                                 // No more vectors to traverse?
@@ -130,21 +131,22 @@
             if ((target_sq & 0x88)) break;                               // Stop if target square is offboard
             if (piece == wP && direction > 0) break;                     // White pawns move only upwards
             if (piece == bP && direction < 0) break;                     // Black pawns move only downwards
-            if ((piece & 0x02)) {                                        // If piece is black
+            if (piece & 0x02) {                                          // If piece is black
               if (board[target_sq] & 0x02) break;                        // Stop if target square contains a black piece
               if (piece & 0x04)                                          // Is it a pawn?
                 if ((board[target_sq] + vector_offset) % 2 != 0) break;  // Skip illegal pawn moves
-                
+              move_list.push([source_sq, target_sq]);                    // Add move to the move list
 
-              debug_board[target_sq+8] = 0x10;                           // Add move to the move list
-
+              debug_board[target_sq+8] = 0x80;
 
               if ((board[target_sq] & 0x03) == 1) break;                 // Target square contains a white piece
             } else {                                                     // If piece is white
-              // TODO: if move is legal mark attacked square
+              if (board[target_sq])                                      // If there is a piece on the target square
+                if ((board[target_sq] & 0x02) == 0) break;               // Stop if hit the white piece
+                if ((piece + vector_offset) == (wP - 0x10)) break;       // Stop if white pawn moves forward
+              board[target_sq+8] = 0x80;                                 // Mark square attacked by white
+              if (board[target_sq] & 0x02) break;                        // Stop if hit the black piece
             }
-            
-
             if ((piece & 0x08)) continue;                                // Do not follow attack ray for leaper pieces
             else {                                                       // Exception for pawns
               if (((target_sq & 0x70) + piece) == (bP + 0x20))           // If black pawn move to 6th rank
@@ -174,6 +176,7 @@
     }
   }
   console.log(position);                                                 // Render board
+  console.log(move_list)
 
 
 
