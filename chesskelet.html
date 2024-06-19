@@ -1,4 +1,4 @@
-<div id="board" style="text-align: center; font-family: monospace; font-size: 80px"></div>
+<div id="board" style="text-align: center; font-family: monospace; font-size: 60px"></div>
 <script>
   /*********************************************\
                    ChesSkelet JS
@@ -74,8 +74,7 @@
     0x41: '♔'                                                            // White king
   };
 
-  var side = 0;
-  /*var board = [                                                          // Chess board representation
+  var board = [                                                          // Chess board representation
     bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,             //
     bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,             // Left hand side of the board
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // is used to store the current
@@ -84,10 +83,10 @@
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Right hand side of board is
     wP, wP, wP, wP, wP, wP, wP, wP,  0, 0, 0, 0, 0, 0, 0, 0,             // used to store white attack
     wR, wN, wB, wQ, wK, wB, wN, wR,  0, 0, 0, 0, 0, 0, 0, 0              // map
-  ];*/
+  ];
   
   var debug_board = new Array(128).fill(0);
-  var board = [                                                          // Chess board representation
+  /*var board = [                                                          // Chess board representation
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 8 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
@@ -96,7 +95,7 @@
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 3 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 2 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0              // Rank 1 + dummy squares
-  ];
+  ];*/
   
   var vector_pointers = {                                                // Move vector table pointers
     0x87: 0xFA,                                                          // Pawn moves address
@@ -115,8 +114,47 @@
 
   let best_move = [];
   let best_score = 0;
-  let position = "";                                                     // Board position string to print
   let move_list = [];                                                    // All moves generated for black
+
+  const boardView = document.getElementById("board");
+  var user_move = "";
+
+  renderBoard();
+  /*document.addEventListener("keydown", function(e) {
+    boardView.innerHTML += e.key;
+    user_move += e.key;
+    if (e.key == "Enter") {
+      console.log("user move: " + user_move);
+      
+      user_move = "";
+      renderBoard();
+      search();
+      renderBoard();
+    }
+  });*/
+
+  //search();
+
+
+function renderBoard() {
+  let position = "";
+  for (let sq = 0; sq < 128; sq++) {                 // Loop over board source_sqs
+    if ((sq & 0x08) == 0) {
+      position += pieces[board[sq]];
+    } else {
+      position += "<br>";
+      sq += 7;
+    }
+  }
+  boardView.innerHTML = position;
+}
+
+
+
+function search() {
+  best_score = 0;
+  best_move = [];
+  move_list = [];
   for (let source_sq = 0; source_sq < 128; source_sq++) {                // Loop over board squares
     if ((source_sq & 0x08) == 0) {                                       // If square is on board
       let piece = board[source_sq];                                      // Get square content
@@ -141,14 +179,14 @@
                 if ((board[target_sq] + vector_offset) % 2 != 0) break;  // Skip illegal pawn moves
               move_list.push([source_sq, target_sq]);                    // Add move to the move list
 
-              debug_board[target_sq+8] = 0x80;
+              //debug_board[target_sq+8] = 0x80;
 
               if ((board[target_sq] & 0x03) == 1) break;                 // Target square contains a white piece
             } else {                                                     // If piece is white
               if (board[target_sq])                                      // If there is a piece on the target square
                 if ((board[target_sq] & 0x02) == 0) break;               // Stop if hit the white piece
                 if ((piece + vector_offset) == (wP - 0x10)) break;       // Stop if white pawn moves forward
-              board[target_sq+8] = 0x80;                                 // Mark square attacked by white
+              //board[target_sq+8] = 0x80;                                 // Mark square attacked by white
               if (board[target_sq] & 0x02) break;                        // Stop if hit the black piece
             }
             if ((piece & 0x08)) continue;                                // Do not follow attack ray for leaper pieces
@@ -173,13 +211,12 @@
           }
         }
       }
-      position += pieces[piece];                                         // Print piece
+     // position += pieces[piece];                                         // Print piece
     } else {                                                             // Otherwise square is off board
-      position += "<br>";                                                // Print new line
-      source_sq += 7;                                                    // Skip offboard squares
+     // position += "<br>";                                                // Print new line
+     // source_sq += 7;                                                    // Skip offboard squares
     }
   }
-  document.getElementById("board").innerHTML = position;                 // Render board
   for (let i = 0; i < move_list.length; i++) {                           // Loop over moves in a move list
     let valuation = 0x80;                                                // Default valuation
     valuation += board[move_list[i][1]];                                 // Add target piece value
@@ -193,10 +230,17 @@
       best_score = valuation;
       best_move = move_list[i];
     }
-    //console.log(moveToString(move_list[i][0], move_list[i][1]) + "  " + valuation);
+    console.log(moveToString(move_list[i][0], move_list[i][1]) + "  " + valuation);
   }
-  console.log(moveToString(best_move[0], best_move[1]) + "  " + best_score);
-  
+  board[best_move[1]] = board[best_move[0]];
+  board[best_move[0]] = 0x00;
+  console.log("best move:", moveToString(best_move[0], best_move[1]) + "  " + best_score);
+ /* console.log("Black moves:");
+  printAttackBoard(debug_board);
+  console.log("White attacks:");
+  printAttackBoard(board);*/
+  renderBoard();
+}  
 
   // DEBUG
   function moveToString(source_sq, target_sq) {
@@ -221,9 +265,5 @@
     console.log(attacks);
   }
 
-  console.log("Black moves:");
-  printAttackBoard(debug_board);
-  console.log("White attacks:");
-  printAttackBoard(board);
 
 </script>
