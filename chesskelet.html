@@ -123,20 +123,28 @@
   var user_move = "";
 
   renderBoard();
-  document.addEventListener("keydown", function(e) {
-    boardView.innerHTML += e.key;
-    user_move += e.key;
-    if (user_move.length == 4) {
-      let source_sq = parseSquare(user_move[0]+user_move[1]);
-      let target_sq = parseSquare(user_move[2]+user_move[3]);
-      board[target_sq] = board[source_sq];
-      board[source_sq] = 0x00;
-      user_move = "";
-      renderBoard();
-      search();
-    }
-  });
+  document.addEventListener("keydown", userInput);
 
+function userInput(e) {
+  boardView.innerHTML += e.key;
+  user_move += e.key;
+  if (user_move.length == 4) {
+    let source_sq = parseSquare(user_move[0]+user_move[1]);
+    let target_sq = parseSquare(user_move[2]+user_move[3]);
+    if (board[target_sq] == bK) {
+      alert("Black is checkmated!");
+      document.removeEventListener("keydown", userInput);
+      return;
+    }
+    board[target_sq] = board[source_sq];
+    board[source_sq] = 0x00;
+    if (target_sq < 8 && board[target_sq] == wP)
+      board[target_sq] = wQ;
+    user_move = "";
+    renderBoard();
+    search();
+  }
+}
 
 function parseSquare(square) {
   const file = square.charCodeAt(0) - 'a'.charCodeAt(0);
@@ -236,6 +244,10 @@ function search() {
       best_move = move_list[i];
     }
     console.log(moveToString(move_list[i][0], move_list[i][1]) + "  " + (move_list[i][1]>>4));
+  }
+  if (board[best_move[1]] == wK) {
+    alert("White is checkmated!");
+    document.removeEventListener("keydown", userInput);
   }
   if (board[best_move[0]] == bP && best_move[1] >= 0x70)
     board[best_move[1]] = bQ
