@@ -32,5 +32,5 @@ https://maksimkorzh.github.io/chesskelet-js/chesskelet.html
 # Known issues
 Most quirks come with so called 1.5 ply search,
 it would move a pawn away if under attack even
-if exposing king to check. It may leave king in
-check due to the same reason.
+if exposing king to check. It may also leave king in
+check to avoid loosing material.
