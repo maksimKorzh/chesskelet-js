@@ -87,17 +87,16 @@
   var debug_board = new Array(128).fill(0);
   var board = [                                                          // Chess board representation
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 8 + dummy squares
-    eS, eS, eS, eS, wP, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
+    eS, eS, eS, eS, bP, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 5 + dummy squares
-    eS, eS, eS, eS, bQ, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
-    eS, eS, eS, wP, eS, bP, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 3 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 3 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 2 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0              // Rank 1 + dummy squares
   ];
   
   var vector_pointers = {                                                // Move vector table pointers
-    //0x82: 0xF0,
     0x87: 0xFA,                                                          // Pawn moves address
     0x93: 0xF4,                                                          // Knight moves address
     0x9B: 0xFB,                                                          // Bishop moves address
@@ -146,7 +145,13 @@
             }
             
 
-            if ((piece & 0x08) == 0) break;                              // Do not follow attack ray for leaper pieces
+            if ((piece & 0x08)) continue;                                // Do not follow attack ray for leaper pieces
+            else {                                                       // Exception for pawns
+              if (((target_sq & 0x70) + piece) == (bP + 0x20))           // If black pawn move to 6th rank
+                if (board[target_sq+0x10] == 0) continue;                // Generate double push if target is empty
+                else break                                               // Stop if double push target has a piece
+              else break                                                 // Stop if black pawn does not attack 6th rank
+            }
           }
           if (direction > 0) {                                           // If direction is positive
             vector_pointer++;                                            // Increment vector pointer
