@@ -1,4 +1,7 @@
-<div id="board" style="text-align: center; font-family: monospace; font-size: 60px"></div>
+<div id="board"
+     style="text-align: center;
+            font-family: monospace;
+            font-size: 60px;"></div>
 <script>
   /*********************************************\
                    ChesSkelet JS
@@ -59,7 +62,7 @@
   const bK = 0x43;                                                       // Black king
 
   let pieces = {                                                         // Piece chars
-    0x00: '.',                                                           // Empty square
+    0x00: '&nbsp;',                                                           // Empty square
     0x07: '♟︎',                                                           // Black pawn
     0x13: '♞',                                                           // Black knight
     0x1B: '♝',                                                           // Black bishop
@@ -143,18 +146,20 @@ function parseSquare(square) {
 
 function renderBoard() {
   let position = "";
+  let dark = 0;
   for (let sq = 0; sq < 128; sq++) {                 // Loop over board source_sqs
     if ((sq & 0x08) == 0) {
-      position += pieces[board[sq]];
+      position += '<span style="display: inline-block; width: 65px; background-color: '
+                   + ( dark ? '#777': '#EEE') + ';">' + pieces[board[sq]] + '</span>';
+      dark ^= 1;
     } else {
+      dark ^= 1;
       position += "<br>";
       sq += 7;
     }
   }
   boardView.innerHTML = position;
 }
-
-
 
 function search() {
   best_score = 0;
