@@ -14,7 +14,7 @@ people, including myself, are familiar with Z80 good enough
 to write some programs in it I thought it would be a good
 idea to port the program into a somewhat high-level language.
 Since the program does not rely on recursion execution speed
-is out of question, so I decided to choose javascript for the
+is not a problem, so I decided to choose javascript for the
 biggest coverage. You may enjoy the program just right in your
 browser.
 
