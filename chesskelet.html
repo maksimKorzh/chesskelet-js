@@ -74,6 +74,7 @@
     0x41: '♔'                                                            // White king
   };
 
+  var side = 0;
   /*var board = [                                                          // Chess board representation
     bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,             //
     bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,             // Left hand side of the board
@@ -112,6 +113,8 @@
     0x01, 0x10, 0x0F, 0x11, 0x00                                         // Queen/King, Pawn (+1), Bishop (+2)
   ];
 
+  let best_move = [];
+  let best_score = 0;
   let position = "";                                                     // Board position string to print
   let move_list = [];                                                    // All moves generated for black
   for (let source_sq = 0; source_sq < 128; source_sq++) {                // Loop over board squares
@@ -177,38 +180,22 @@
     }
   }
   document.getElementById("board").innerHTML = position;                 // Render board
-
-
-  // MV = TP + MPS - MPT + SV
-  // move value = target piece
-
-
   for (let i = 0; i < move_list.length; i++) {                           // Loop over moves in a move list
-
     let valuation = 0x80;                                                // Default valuation
     valuation += board[move_list[i][1]];                                 // Add target piece value
-
-
     if (board[move_list[i][0]+8])                                        // If source square attacked by white
       valuation += board[move_list[i][0]];                               // Add source piece value
-
     if (board[move_list[i][1]+8])                                        // If target square attacked by black
       valuation -= board[move_list[i][0]];                               // Subtract source piece value
-      
     valuation += (move_list[i][1] + 0x03) & 0x05;                        // Evaluate column (prefer center)
     valuation += move_list[i][1] >> 4;                                   // Evaluate row (prefer 1 row)
-
-    console.log(moveToString(move_list[i][0], move_list[i][1]) + "  " + valuation);
-
-
-    // 0x80 starting valuation
-    // += target piece
-    // if source square attacked by white += source piece
-    // if target square attacked by white -= source piece
-
-
-
+    if (valuation > best_score) {
+      best_score = valuation;
+      best_move = move_list[i];
+    }
+    //console.log(moveToString(move_list[i][0], move_list[i][1]) + "  " + valuation);
   }
+  console.log(moveToString(best_move[0], best_move[1]) + "  " + best_score);
   
 
   // DEBUG
