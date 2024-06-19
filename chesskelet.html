@@ -1,3 +1,4 @@
+<div id="board" style="text-align: center; font-family: monospace; font-size: 80px"></div>
 <script>
   /*********************************************\
                    ChesSkelet JS
@@ -42,7 +43,7 @@
          Bit2 - Bit6: piece value
 
   \*********************************************/
-
+  
   const eS = 0x00;                                                       // Empty square
   const wP = 0x05;                                                       // White pawn
   const wN = 0x11;                                                       // White knight
@@ -59,18 +60,18 @@
 
   let pieces = {                                                         // Piece chars
     0x00: '.',                                                           // Empty square
-    0x07: 'p',                                                           // Black pawn
-    0x13: 'n',                                                           // Black knight
-    0x1B: 'b',                                                           // Black bishop
-    0x2B: 'r',                                                           // Black rook
-    0x3B: 'q',                                                           // Black queen
-    0x43: 'k',                                                           // Black king
-    0x05: 'P',                                                           // White pawn
-    0x11: 'N',                                                           // White knight
-    0x19: 'B',                                                           // White bishop
-    0x29: 'R',                                                           // White rook
-    0x39: 'Q',                                                           // White queen
-    0x41: 'K'                                                            // White king
+    0x07: '♟︎',                                                           // Black pawn
+    0x13: '♞',                                                           // Black knight
+    0x1B: '♝',                                                           // Black bishop
+    0x2B: '♜',                                                           // Black rook
+    0x3B: '♛',                                                           // Black queen
+    0x43: '♚',                                                           // Black king
+    0x05: '♙',                                                           // White pawn
+    0x11: '♘',                                                           // White knight
+    0x19: '♗',                                                           // White bishop
+    0x29: '♖',                                                           // White rook
+    0x39: '♕',                                                           // White queen
+    0x41: '♔'                                                            // White king
   };
 
   var board = [                                                          // Chess board representation
@@ -86,11 +87,11 @@
   
   var debug_board = new Array(128).fill(0);
   /*var board = [                                                          // Chess board representation
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 8 + dummy squares
+    eS, eS, eS, eS, bK, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 8 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
-    eS, eS, eS, eS, wR, wP, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 5 + dummy squares
-    eS, eS, eS, eS, bP, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
+    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 3 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 2 + dummy squares
     eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0              // Rank 1 + dummy squares
@@ -102,7 +103,7 @@
     0x9B: 0xFB,                                                          // Bishop moves address
     0xAB: 0xF1,                                                          // Rook moves address
     0xBB: 0xF9,                                                          // Queen moves address
-    0xD3: 0xF9                                                           // King Moves address
+    0xC3: 0xF9                                                           // King Moves address
   };
 
   var vector_lists = [                                                   // Move vector table
@@ -138,6 +139,7 @@
               move_list.push([source_sq, target_sq]);                    // Add move to the move list
 
               debug_board[target_sq+8] = 0x80;
+              console.log(source_sq.toString(16) + "  " + target_sq.toString(16))
 
               if ((board[target_sq] & 0x03) == 1) break;                 // Target square contains a white piece
             } else {                                                     // If piece is white
@@ -171,21 +173,18 @@
       }
       position += pieces[piece];                                         // Print piece
     } else {                                                             // Otherwise square is off board
-      position += "\n";                                                  // Print new line
+      position += "<br>";                                                // Print new line
       source_sq += 7;                                                    // Skip offboard squares
     }
   }
-  console.log(position);                                                 // Render board
-  console.log(move_list)
-
-
+  document.getElementById("board").innerHTML = position;                 // Render board
 
   // DEBUG
-  function printAttackBoard() {
+  function printAttackBoard(brd) {
     let attacks = "";
     for (let sq = 0; sq < 128; sq++) {                 // Loop over board source_sqs
       if ((sq & 0x08) == 8) {
-        attacks += debug_board[sq] ? "x": ".";
+        attacks += brd[sq] ? "x": ".";
       } else {
         attacks += "\n";
         sq += 7;
@@ -194,6 +193,9 @@
     console.log(attacks);
   }
 
-  printAttackBoard();
+  console.log("Black attacks:");
+  printAttackBoard(debug_board);
+  console.log("White attacks:");
+  printAttackBoard(board);
 
 </script>
