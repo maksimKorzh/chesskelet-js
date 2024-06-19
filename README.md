@@ -20,7 +20,7 @@ browser.
 
 # Original project (Guinness world record holder)
 http://borialabs.free.nf/chesskelet/<br>
-Special thanks to Alex Garcia for helping me with this port!
+Special thanks to Alex Garcia, the author of the original project, for helping me with this port!
 
 # How to play
 Enter moves from keyboard, e.g. "e2e4"<br>
