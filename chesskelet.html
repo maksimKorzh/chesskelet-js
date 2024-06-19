@@ -1,179 +1,163 @@
-<div id="board"
-     style="text-align: center;
-            font-family: monospace;
-            font-size: 60px;"></div>
+<div id="board" style="text-align: center; font-family: monospace; font-size: 60px;"></div>
 <script>
-  /*********************************************\
-                   ChesSkelet JS
+/*********************************************\
+                 ChesSkelet JS
 
-        a port of ChesSkelet by Alex Garcia
-          from Z80 assembly to JavaScript
+      a port of ChesSkelet by Alex Garcia
+        from Z80 assembly to JavaScript
 
-                by Code Monkey King
+              by Code Monkey King
 
-  \*********************************************/
+\*********************************************/
 
-  /*********************************************\
- 
-     Color encoding:
+/*********************************************\
 
-         White = 0
-         Black = 1
+   Color encoding:
 
-     Piece encoding:
-     
-         wP = 0x05   0 0 00  01 01
-         wN = 0x11   0 0 01  00 01
-         wB = 0x19   0 0 01  10 01
-         wR = 0x29   0 0 10  10 01
-         wQ = 0x39   0 0 11  10 01
-         wK = 0x41   0 1 00  00 01
+       White = 0
+       Black = 1
 
-         bP = 0x07   0 0 00  01 11
-         bN = 0x13   0 0 01  00 11
-         bB = 0x1B   0 0 01  10 11
-         bR = 0x2B   0 0 10  10 11
-         bQ = 0x3B   0 0 11  10 11
-         bK = 0x43   0 1 00  00 11
+   Piece encoding:
+   
+       wP = 0x05   0 0 00  01 01
+       wN = 0x11   0 0 01  00 01
+       wB = 0x19   0 0 01  10 01
+       wR = 0x29   0 0 10  10 01
+       wQ = 0x39   0 0 11  10 01
+       wK = 0x41   0 1 00  00 01
 
-         Bit0: set to 1 for all pieces
-         Bit1: piece color
-         Bit2: identifies pawns
-         Bit3: identifies slider pieces
-         Bit4: contributes to piece value
-         Bit5: contributes to piece value
-         Bit6: identifies the King
-         Bit2 - Bit6: piece value
+       bP = 0x07   0 0 00  01 11
+       bN = 0x13   0 0 01  00 11
+       bB = 0x1B   0 0 01  10 11
+       bR = 0x2B   0 0 10  10 11
+       bQ = 0x3B   0 0 11  10 11
+       bK = 0x43   0 1 00  00 11
 
-  \*********************************************/
-  
-  const eS = 0x00;                                                       // Empty square
-  const wP = 0x05;                                                       // White pawn
-  const wN = 0x11;                                                       // White knight
-  const wB = 0x19;                                                       // White bishop
-  const wR = 0x29;                                                       // White rook
-  const wQ = 0x39;                                                       // White queen
-  const wK = 0x41;                                                       // White king
-  const bP = 0x07;                                                       // Black pawn
-  const bN = 0x13;                                                       // Black knight
-  const bB = 0x1B;                                                       // Black bishop
-  const bR = 0x2B;                                                       // Black rook
-  const bQ = 0x3B;                                                       // Black queen
-  const bK = 0x43;                                                       // Black king
+       Bit0: set to 1 for all pieces
+       Bit1: piece color
+       Bit2: identifies pawns
+       Bit3: identifies slider pieces
+       Bit4: contributes to piece value
+       Bit5: contributes to piece value
+       Bit6: identifies the King
+       Bit2 - Bit6: piece value
 
-  let pieces = {                                                         // Piece chars
-    0x00: '&nbsp;',                                                           // Empty square
-    0x07: '♟︎',                                                           // Black pawn
-    0x13: '♞',                                                           // Black knight
-    0x1B: '♝',                                                           // Black bishop
-    0x2B: '♜',                                                           // Black rook
-    0x3B: '♛',                                                           // Black queen
-    0x43: '♚',                                                           // Black king
-    0x05: '♙',                                                           // White pawn
-    0x11: '♘',                                                           // White knight
-    0x19: '♗',                                                           // White bishop
-    0x29: '♖',                                                           // White rook
-    0x39: '♕',                                                           // White queen
-    0x41: '♔'                                                            // White king
-  };
+\*********************************************/
 
-  var board = [                                                          // Chess board representation
-    bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,             //
-    bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,             // Left hand side of the board
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // is used to store the current
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // position
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // 
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Right hand side of board is
-    wP, wP, wP, wP, wP, wP, wP, wP,  0, 0, 0, 0, 0, 0, 0, 0,             // used to store white attack
-    wR, wN, wB, wQ, wK, wB, wN, wR,  0, 0, 0, 0, 0, 0, 0, 0              // map
-  ];
-  
-  var debug_board = new Array(128).fill(0);
-  /*var board = [                                                          // Chess board representation
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 8 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 7 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 6 + dummy squares
-    eS, eS, eS, eS, bP, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 5 + dummy squares
-    eS, eS, eS, wQ, eS, wR, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 4 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 3 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,             // Rank 2 + dummy squares
-    eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0              // Rank 1 + dummy squares
-  ];*/
-  
-  var vector_pointers = {                                                // Move vector table pointers
-    0x87: 0xFA,                                                          // Pawn moves address
-    0x93: 0xF4,                                                          // Knight moves address
-    0x9B: 0xFB,                                                          // Bishop moves address
-    0xAB: 0xF1,                                                          // Rook moves address
-    0xBB: 0xF9,                                                          // Queen moves address
-    0xC3: 0xF9                                                           // King Moves address
-  };
+const eS = 0x00;                                                         // Empty square
+const wP = 0x05;                                                         // White pawn
+const wN = 0x11;                                                         // White knight
+const wB = 0x19;                                                         // White bishop
+const wR = 0x29;                                                         // White rook
+const wQ = 0x39;                                                         // White queen
+const wK = 0x41;                                                         // White king
+const bP = 0x07;                                                         // Black pawn
+const bN = 0x13;                                                         // Black knight
+const bB = 0x1B;                                                         // Black bishop
+const bR = 0x2B;                                                         // Black rook
+const bQ = 0x3B;                                                         // Black queen
+const bK = 0x43;                                                         // Black king
 
-  var vector_lists = [                                                   // Move vector table
-    0x01, 0x10, 0x00,                                                    // Rook move offsets
-    0x0E, 0x1F, 0x12, 0x21, 0x00,                                        // Knight move offsets
-    0x01, 0x10, 0x0F, 0x11, 0x00                                         // Queen/King, Pawn (+1), Bishop (+2)
-  ];
+let pieces = {                                                           // Piece chars
+  0x00: '&nbsp;',                                                             // Empty square
+  0x07: '♟︎',                                                             // Black pawn
+  0x13: '♞',                                                             // Black knight
+  0x1B: '♝',                                                             // Black bishop
+  0x2B: '♜',                                                             // Black rook
+  0x3B: '♛',                                                             // Black queen
+  0x43: '♚',                                                             // Black king
+  0x05: '♙',                                                             // White pawn
+  0x11: '♘',                                                             // White knight
+  0x19: '♗',                                                             // White bishop
+  0x29: '♖',                                                             // White rook
+  0x39: '♕',                                                             // White queen
+  0x41: '♔'                                                              // White king
+};
 
-  let best_move = [];
-  let best_score = 0;
-  let move_list = [];                                                    // All moves generated for black
+var board = [                                                            // Chess board representation
+  bR, bN, bB, bQ, bK, bB, bN, bR,  0, 0, 0, 0, 0, 0, 0, 0,               //
+  bP, bP, bP, bP, bP, bP, bP, bP,  0, 0, 0, 0, 0, 0, 0, 0,               // Left hand side of the board
+  eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,               // is used to store the current
+  eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,               // position
+  eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,               // 
+  eS, eS, eS, eS, eS, eS, eS, eS,  0, 0, 0, 0, 0, 0, 0, 0,               // Right hand side of board is
+  wP, wP, wP, wP, wP, wP, wP, wP,  0, 0, 0, 0, 0, 0, 0, 0,               // used to store white attack
+  wR, wN, wB, wQ, wK, wB, wN, wR,  0, 0, 0, 0, 0, 0, 0, 0                // map
+];
 
-  const boardView = document.getElementById("board");
-  var user_move = "";
+var vector_pointers = {                                                  // Move vector table pointers
+  0x87: 0xFA,                                                            // Pawn moves address
+  0x93: 0xF4,                                                            // Knight moves address
+  0x9B: 0xFB,                                                            // Bishop moves address
+  0xAB: 0xF1,                                                            // Rook moves address
+  0xBB: 0xF9,                                                            // Queen moves address
+  0xC3: 0xF9                                                             // King Moves address
+};
 
-  renderBoard();
-  document.addEventListener("keydown", userInput);
+var vector_lists = [                                                     // Move vector table
+  0x01, 0x10, 0x00,                                                      // Rook move offsets
+  0x0E, 0x1F, 0x12, 0x21, 0x00,                                          // Knight move offsets
+  0x01, 0x10, 0x0F, 0x11, 0x00                                           // Queen/King, Pawn (+1), Bishop (+2)
+];
 
-function userInput(e) {
-  boardView.innerHTML += e.key;
-  user_move += e.key;
-  if (user_move.length == 4) {
-    let source_sq = parseSquare(user_move[0]+user_move[1]);
-    let target_sq = parseSquare(user_move[2]+user_move[3]);
-    if (board[target_sq] == bK) {
-      alert("Black is checkmated!");
-      document.removeEventListener("keydown", userInput);
-      return;
+let best_move = [];                                                      // Best move found by computer
+let best_score = 0;                                                      // Best score found by computer
+let move_list = [];                                                      // All moves generated for black
+var user_move = "";                                                      // User move storage
+const boardView = document.getElementById("board");                      // Hook chess board view element
+document.addEventListener("keydown", userInput);                         // Listen to keyboard input
+
+function userInput(e) {                                                  // Handle user input
+  boardView.innerHTML += e.key;                                          // Display char typed by the user
+  user_move += e.key;                                                    // Store char to user move variable
+  if (user_move.length == 4) {                                           // End of input?
+    let source_sq = parseSquare(user_move[0]+user_move[1]);              // Parse user move source square
+    let target_sq = parseSquare(user_move[2]+user_move[3]);              // Parse user move target square
+    if (board[target_sq] == bK) {                                        // If user captures black king
+      alert("Black is checkmated!");                                     // Notify user that game is over
+      document.removeEventListener("keydown", userInput);                // Disable keyboard input
+      return;                                                            // Do not update board
     }
-    board[target_sq] = board[source_sq];
-    board[source_sq] = 0x00;
-    if (target_sq < 8 && board[target_sq] == wP)
-      board[target_sq] = wQ;
-    user_move = "";
-    renderBoard();
-    search();
+    board[target_sq] = board[source_sq];                                 // Move user piece
+    board[source_sq] = 0x00;                                             // Clear user piece source square
+    if (target_sq < 8 && board[target_sq] == wP)                         // If user pawn promotes
+      board[target_sq] = wQ;                                             // Turn user pawn into queen
+    user_move = "";                                                      // Clear user move
+    renderBoard();                                                       // Draw chess board
+    search();                                                            // Ask computer to play a move
   }
 }
 
-function parseSquare(square) {
-  const file = square.charCodeAt(0) - 'a'.charCodeAt(0);
-  const rank = 7 - (square.charCodeAt(1) - '1'.charCodeAt(0));
-  return rank * 16 + file;
+function parseSquare(square) {                                           // Helper function to parse user input
+  const file = square.charCodeAt(0) - 'a'.charCodeAt(0);                 // Extract file from user input
+  const rank = 7 - (square.charCodeAt(1) - '1'.charCodeAt(0));           // Extract rank from user input
+  return rank * 16 + file;                                               // Calculate square
 }
 
-function renderBoard() {
-  let position = "";
-  let dark = 0;
-  for (let sq = 0; sq < 128; sq++) {                 // Loop over board source_sqs
-    if ((sq & 0x08) == 0) {
-      position += '<span style="display: inline-block; width: 65px; background-color: '
-                   + ( dark ? '#777': '#EEE') + ';">' + pieces[board[sq]] + '</span>';
-      dark ^= 1;
-    } else {
-      dark ^= 1;
-      position += "<br>";
-      sq += 7;
+function renderBoard() {                                                 // Function to draw board
+  let position = "";                                                     // String containing board position
+  let dark = 0;                                                          // Dark square flag
+  for (let sq = 0; sq < 128; sq++) {                                     // Loop over board squares
+    if ((sq & 0x08) == 0) {                                              // If square is on board
+      position += '<span style="display: inline-block;'                  //
+                   + 'width: 65px; background-color: '                   // Chess board
+                   + ( dark ? '#777': '#EEE') + ';">'                    // CSS styling
+                   + pieces[board[sq]] + '</span>';                      //
+      dark ^= 1;                                                         // Toggle dark square flag
+    } else {                                                             // Square is offboard
+      dark ^= 1;                                                         // Toggle dark square flag
+      position += "<br>";                                                // New line between ranks
+      sq += 7;                                                           // Skip offboard squares
     }
   }
-  boardView.innerHTML = position;
+  boardView.innerHTML = position;                                        // Render board to browser page
 }
 
-function search() {
-  best_score = 0;
-  best_move = [];
-  move_list = [];
-  attacks = new Array(128).fill(0);
+function search() {                                                      // Chess program
+  best_score = 0;                                                        // Best score found during search
+  best_move = [];                                                        // A move associated to best score
+  move_list = [];                                                        // Place to store generated moves
+  attacks = new Array(128).fill(0);                                      // Clear white attack map
   for (let source_sq = 0; source_sq < 128; source_sq++) {                // Loop over board squares
     if ((source_sq & 0x08) == 0) {                                       // If square is on board
       let piece = board[source_sq];                                      // Get square content
@@ -234,55 +218,26 @@ function search() {
     valuation += board[move_list[i][1]];                                 // Add target piece value
     if (attacks[move_list[i][0]])                                        // If source square attacked by white
       valuation += board[move_list[i][0]];                               // Add source piece value
-    if (attacks[move_list[i][1]])                                          // If target square attacked by black
+    if (attacks[move_list[i][1]])                                        // If target square attacked by black
       valuation -= board[move_list[i][0]];                               // Subtract source piece value
     valuation += (move_list[i][1] + 0x03) & 0x05;                        // Evaluate column (prefer center)
     valuation += move_list[i][1] >> 4;                                   // Evaluate row (prefer 1 row)
-
-    if (valuation > best_score) {
-      best_score = valuation;
-      best_move = move_list[i];
+    if (valuation > best_score) {                                        // Found better move?
+      best_score = valuation;                                            // Update best score
+      best_move = move_list[i];                                          // Save best move
     }
-    console.log(moveToString(move_list[i][0], move_list[i][1]) + "  " + (move_list[i][1]>>4));
   }
-  if (board[best_move[1]] == wK) {
-    alert("White is checkmated!");
-    document.removeEventListener("keydown", userInput);
+  if (board[best_move[1]] == wK) {                                       // If white king is taken computer won
+    alert("White is checkmated!");                                       // Notify user about it
+    document.removeEventListener("keydown", userInput);                  // Disable user input
   }
-  if (board[best_move[0]] == bP && best_move[1] >= 0x70)
-    board[best_move[1]] = bQ
-  else
-    board[best_move[1]] = board[best_move[0]];
-  board[best_move[0]] = 0x00;
-  console.log("best move:", moveToString(best_move[0], best_move[1]) + "  " + best_score);
-  console.log("White attacks:");
-  console.log(attacks)
-  printAttackBoard(attacks);
-  renderBoard();
+  if (board[best_move[0]] == bP && best_move[1] >= 0x70)                 // If computer promotes a pawn
+    board[best_move[1]] = bQ                                             // Turn it into a black queen
+  else                                                                   // Otherwise
+    board[best_move[1]] = board[best_move[0]];                           // Just make a move
+  board[best_move[0]] = 0x00;                                            // and clear source square
+  renderBoard();                                                         // Draw board
 }  
 
-  // DEBUG
-  function moveToString(source_sq, target_sq) {
-    let src_c = String.fromCharCode('a'.charCodeAt(0) + (source_sq & 0x0F));
-    let src_r = 8 - ((source_sq & 0xF0) >> 4);
-    let dst_c = String.fromCharCode('a'.charCodeAt(0) + (target_sq & 0x0F));
-    let dst_r = 8 - ((target_sq & 0xF0) >> 4);
-    let move_str = src_c+src_r+dst_c+dst_r;
-    return move_str;
-  }
-
-  function printAttackBoard(brd) {
-    let attacks = "";
-    for (let sq = 0; sq < 128; sq++) {                 // Loop over board source_sqs
-      if ((sq & 0x08) == 0) {
-        attacks += brd[sq] ? "x": ".";
-      } else {
-        attacks += "\n";
-        sq += 7;
-      }
-    }
-    console.log(attacks);
-  }
-
-
+renderBoard();                                                           // Initially draw board
 </script>
