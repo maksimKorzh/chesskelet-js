@@ -141,7 +141,7 @@ function renderBoard() {                                                 // Func
     if ((sq & 0x08) == 0) {                                              // If square is on board
       position += '<span style="display: inline-block;'                  //
                    + 'width: 65px; background-color: '                   // Chess board
-                   + ( dark ? '#777': '#EEE') + ';">'                    // CSS styling
+                   + ( dark ? '#AAA': '#EEE') + ';">'                    // CSS styling
                    + pieces[board[sq]] + '</span>';                      //
       dark ^= 1;                                                         // Toggle dark square flag
     } else {                                                             // Square is offboard
@@ -183,11 +183,9 @@ function search() {                                                      // Ches
               move_list.push([source_sq, target_sq]);                    // Add move to the move list
               if ((board[target_sq] & 0x03) == 1) break;                 // Target square contains a white piece
             } else {                                                     // If piece is white
-              if (board[target_sq])                                      // If there is a piece on the target square
-                if ((board[target_sq] & 0x02) == 0) break;               // Stop if hit the white piece
-                if ((piece + vector_offset) == (wP - 0x10)) break;       // Stop if white pawn moves forward
+              if ((piece + vector_offset) == (wP - 0x10)) break;         // Stop if white pawn moves forward
               attacks[target_sq] = 0x80;                                 // Mark square attacked by white
-              if (board[target_sq] & 0x02) break;                        // Stop if hit the black piece
+              if (board[target_sq]) break;                               // Stop if hit any piece
             }
             if ((piece & 0x08)) continue;                                // Do not follow attack ray for leaper pieces
             else {                                                       // Exception for pawns
@@ -214,11 +212,11 @@ function search() {                                                      // Ches
     } 
   }
   for (let i = 0; i < move_list.length; i++) {                           // Loop over moves in a move list
-    let valuation = 0x80;                                                // Default valuation
+    let valuation = 0x7F;                                                // Default valuation
     valuation += board[move_list[i][1]];                                 // Add target piece value
     if (attacks[move_list[i][0]])                                        // If source square attacked by white
       valuation += board[move_list[i][0]];                               // Add source piece value
-    if (attacks[move_list[i][1]])                                        // If target square attacked by black
+    if (attacks[move_list[i][1]])                                        // If target square attacked by white
       valuation -= board[move_list[i][0]];                               // Subtract source piece value
     valuation += (move_list[i][1] + 0x03) & 0x05;                        // Evaluate column (prefer center)
     valuation += move_list[i][1] >> 4;                                   // Evaluate row (prefer 1 row)
